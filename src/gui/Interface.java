@@ -28,7 +28,7 @@ public class Interface {
 	private JFrame frame;
 	private JButton[] buttons;
 	private JButton refresh;
-	private File folder = new File("./Source/images/");
+	private File folder = new File("./images/Faces/");
 	private File[] listOfFiles = folder.listFiles();
 	private int num_emoji = listOfFiles.length - noPicNum(listOfFiles);
 	private String[] unicodes = new String[num_emoji];
@@ -49,16 +49,16 @@ public class Interface {
 	}
 	
 	/**
-	 * Returns the number of jpg pictures in a file
+	 * Returns the number of png pictures in a file
 	 * @param listOfFiles
-	 * @return integer number of jpgs in file
+	 * @return integer number of pngs in file
 	 */
 	private int noPicNum(File[] listOfFiles){
 		String extension;
 		int count = 0;
 		for (int i = 0; i < listOfFiles.length; i++) {
 			extension = getExtension(listOfFiles[i].getName()); 
-			if(!(extension.equals("jpg"))){
+			if(!(extension.equals("png"))){
 				count++;
 			}
 		}
@@ -81,7 +81,7 @@ public class Interface {
 			if (listOfFiles[i].isFile()) {
 				tempfile 	= listOfFiles[i].getName();
 				if(tempfile.contains(".jpg")){
-					String[] parts 	= tempfile.split(".jpg");
+					String[] parts 	= tempfile.split(".png");
 					String unicode 	= parts[0];
 					unicodes[i] 		= unicode;
 				}
@@ -90,7 +90,7 @@ public class Interface {
 		
 		for(int i = 0; i < num_emoji; i++){
 			buttons[i] = new JButton(new ImageIcon(getClass().getClassLoader().
-					getResource(emojiPath+"\\"+unicodes[i]+".jpg")));
+					getResource(emojiPath+"\\"+unicodes[i]+".png")));
 		}
 	}
 
