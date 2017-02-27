@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
@@ -20,8 +21,10 @@ import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
+import javax.swing.border.EmptyBorder;
 
 
 
@@ -43,7 +46,10 @@ public class tarotApp {
 	// Define mainFrame 
 	private JFrame mainFrame;
 	private JButton[] categories;
-	private JTextPane header;
+	private JLabel header;
+	private JLabel leftIcon;
+	private JLabel rightIcon;
+
 	private JPanel history;
 	private JButton delete;
 	private JButton done;
@@ -96,8 +102,8 @@ public class tarotApp {
 			catPanel.setLayout(new GridLayout(1,numCateg));
 			
 			Dimension buttonSize = categories[0].getPreferredSize();
-			catPanel.setPreferredSize(new Dimension((int)(buttonSize.getWidth() * 10)+1,
-	                (int)(buttonSize.getHeight() * 35)+1 * 2));
+			catPanel.setPreferredSize(new Dimension((int)(buttonSize.getWidth()),
+	                (int)(buttonSize.getHeight() * 10)+1 * 2));
 			
 			catNames[0] = "Faces";
 			catNames[1] = "Nature";
@@ -145,16 +151,37 @@ public class tarotApp {
 		
 		
 		// initialize components
+		header      = new JLabel("Emoji - Tarot");
 		categories	= new JButton[4];
 		delete	 	= new JButton("<-");
 		done 		= new JButton("DONE");
 		
+		// add the header components
+		topPanel.add(header, BorderLayout.CENTER);
+		header.setFont(new Font("Verdana",1,30));
+		topPanel.setBorder(new EmptyBorder(80, 30, 100, 30));
+		
+		leftIcon = new JLabel(new ImageIcon(getClass().getClassLoader().
+				getResource("\\images\\objects\\2728.png")));
+		rightIcon = new JLabel(new ImageIcon(getClass().getClassLoader().
+				getResource("\\images\\objects\\1f52e.png")));
+		topPanel.add(leftIcon, BorderLayout.WEST);
+		topPanel.add(rightIcon, BorderLayout.EAST);
+		
+		// add the category component
 		for(int i = 0; i < numCateg; i++){			
 			categories[i] = new JButton(catNames[i]);
+			//categories[i].setText((catNames[i]));
 		}
-		
 		botPanel.add(makeCatPanel());
+		for(int i = 0; i < numCateg; i++){			
+			categories[i].setText((catNames[i]));
+		}
+		botPanel.setBorder( new EmptyBorder(0,80,100,80));
 		botPanel.setVisible(true);
+		
+		
+		
 		mainFrame.pack();
 		mainFrame.setVisible(true);
 		
