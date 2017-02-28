@@ -41,6 +41,7 @@ public class tarotApp {
 	static String[] sentiScores = new String[751];
 	static String imagePath  	= "./images/";
 	static Emoji[] emojiList;
+	static int historySize = 18;
 	
 	// Set Emoji images path
 	private String emojiPath = "\\images\\faces\\";
@@ -56,8 +57,6 @@ public class tarotApp {
 	private JPanel history;
 	private JButton delete;
 	private JButton done;
-	private JTextPane instr;
-	
 	
 	private JButton[] buttons;
 	private JButton refresh;
@@ -108,10 +107,10 @@ public class tarotApp {
 			catPanel.setPreferredSize(new Dimension((int)(buttonSize.getWidth()),
 	                (int)(buttonSize.getHeight() * 10)+1 * 2));
 			// category names
-			catNames[0] = "Faces";
-			catNames[1] = "Nature";
-			catNames[2] = "Objects";
-			catNames[3] = "Signs";
+			catNames[0] = "<html><span style='font-size:15px'>Faces</span></html>";
+			catNames[1] = "<html><span style='font-size:15px'>Nature</span></html>";
+			catNames[2] = "<html><span style='font-size:15px'>Objects</span></html>";
+			catNames[3] = "<html><span style='font-size:15px'>Signs</span></html>";
 
 			for(int i = 0; i < numCateg; i++){
 				catPanel.add(categories[i]);
@@ -137,11 +136,8 @@ public class tarotApp {
 	}
 
 
-
-
 	private void makeStartWindow() {
-		
-		// Initialize main components
+
 		mainFrame = new JFrame();
 		mainFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		mainFrame.setUndecorated(true);
@@ -153,91 +149,108 @@ public class tarotApp {
 		mainFrame.getContentPane().add(topPanel, BorderLayout.PAGE_START);
 		mainFrame.getContentPane().add(cenPanel, BorderLayout.CENTER);
 		mainFrame.getContentPane().add(botPanel, BorderLayout.PAGE_END);
-		
-		// Description text
-		String descr = "<html><span style='font-size:18px'>Welcome to the Emoji handreading. Show me your Emoji and I tell you who you are. First, you take your smartphone and open you preferred messenging app. Now go to your history of Emoji and enter them into this program. Click through the categories to find at least 5 of your most used Emoji. If you are done, press <b>DONE</b> and wait for the magic to happen.</span></html>";
-		
-		// Initialize components
-		header      = new JLabel("Emoji - Palmistry", SwingConstants.CENTER);
-		descrip 	= new JLabel(descr);
-		categories	= new JButton[4];
-		delete	 	= new JButton("<-");
-		done 		= new JButton("DONE");
-		
-		// add the header components
-		topPanel.add(header, BorderLayout.CENTER);
-		topPanel.add(descrip, BorderLayout.SOUTH);
-		
-		// configuration of header
-		header.setFont(new Font("Helvetica",1,45));
-		descrip.setBorder(new EmptyBorder(40, 0, 0, 0));
-		topPanel.setBorder(new EmptyBorder(80, 30, 40, 30));
-		// create icons
-		leftLabel = new JLabel(new ImageIcon(getClass().getClassLoader().
-				getResource("\\guiGraphics\\header.png")));
-		rightLabel = new JLabel(new ImageIcon(getClass().getClassLoader().
-				getResource("\\guiGraphics\\header.png")));
-		
-		// add the header components
-		topPanel.add(leftLabel, BorderLayout.WEST);
-		topPanel.add(rightLabel, BorderLayout.EAST);
-		
-		// define central panel
-		cenPanel.setLayout(new BoxLayout(cenPanel,BoxLayout.PAGE_AXIS));
-		history = new JPanel();
-		history.setLayout(new BoxLayout(history,BoxLayout.X_AXIS));
-		cenPanel.add(history);
-		
-		// test with a few Emoji
-		Emoji a = new Emoji("1f3c3","faces",0.5);
-		Emoji b = new Emoji("1f4a9","faces",0.7);
-		Emoji c = new Emoji("1f30a","nature",-0.2);
-		emojiList = new Emoji[3];
-		emojiList[0] = a;
-		emojiList[1] = b;
-		emojiList[2] = c;		
-		
-		for (int i = 0; i < emojiList.length; i++) {
-			JLabel tempLab = new JLabel(new ImageIcon(getClass().getClassLoader().
-					getResource(emojiList[i].path)));
-			history.add(tempLab);
-		}
+				
+		topPanel = createTopPanel(topPanel);
+		cenPanel = createCenPanel(cenPanel);
+		botPanel = createBotPanel(botPanel);
 
-		history.setBorder(BorderFactory.createTitledBorder("Your Emoji History:"));
-		
-		cenPanel.setVisible(true);
-		
+		mainFrame.pack();
+		mainFrame.getContentPane().setBackground(Color.ORANGE);
+		mainFrame.setVisible(true);		
+	}
+	
+private JPanel createBotPanel(JPanel panel) {
+		// Initialize components
+		categories	= new JButton[4];
 		// add the category component
 		for(int i = 0; i < numCateg; i++){			
 			categories[i] = new JButton(catNames[i]);
 		}
-		
 		// add bottom panel
-		botPanel.add(makeCatPanel());
-		
+		panel.add(makeCatPanel());
 		for(int i = 0; i < numCateg; i++){			
 			categories[i].setText((catNames[i]));
 		}
-		botPanel.setBorder( new EmptyBorder(0,80,100,80));
-		botPanel.setVisible(true);
+		panel.setBorder( new EmptyBorder(0,80,200,80));
+		panel.setVisible(true);
+		return panel;
+	}
+
+private JPanel createCenPanel(JPanel panel) {
 		
-		// add central 
+		// Create the delete button
+		delete	 	= new JButton();
+		delete.setIcon(new ImageIcon(getClass().getClassLoader().
+				getResource("\\images\\guiGraphics\\del.png")));
+        delete.setBorder(null);
+        delete.setContentAreaFilled(false);
+		// Create the done button
+		done 		= new JButton();
+		done.setIcon(new ImageIcon(getClass().getClassLoader().
+				getResource("\\images\\guiGraphics\\ok.png")));
+		done.setBorder(null);
+        done.setContentAreaFilled(false);
 		
+		// define central panel
+		panel.setLayout(new BoxLayout(panel,BoxLayout.LINE_AXIS));
+		history = new JPanel();
+		history.setLayout(new BoxLayout(history,BoxLayout.X_AXIS));
+		panel.add(history);
+		// call method to initialize history
+		initHistory(history);
+		history.setBorder(BorderFactory.createTitledBorder("Your Emoji History:"));
 		
+		panel.add(delete);
+		panel.add(done);
+		//panel.setBackground(Color.CYAN);
+		panel.setBorder(BorderFactory.createEmptyBorder(-40, 30, 0, 0));
+		panel.setVisible(true);
+		return panel;
+	}
+
+private JPanel createTopPanel(JPanel panel) {
+		String descr = "<html><span style='font-size:18px'>Welcome to the Emoji handreading. Show me your Emoji and I tell you who you are. First, you take your smartphone and open you preferred messenging app. Now go to your history of Emoji and enter them into this program. Click through the categories to find at least 5 of your most used Emoji. If you are done, press <b>DONE</b> and wait for the magic to happen.</span></html>";
+
+		header      = new JLabel("Emoji - Palmistry", SwingConstants.CENTER);
+		descrip 	= new JLabel(descr);
+
+		panel.add(header, BorderLayout.CENTER);
+		panel.add(descrip, BorderLayout.SOUTH);
 		
-		mainFrame.pack();
-		mainFrame.getContentPane().setBackground(Color.ORANGE);
-		mainFrame.setVisible(true);
+		header.setFont(new Font("Helvetica",1,45));
+		descrip.setBorder(new EmptyBorder(40, 0, 0, 0));
+		panel.setBorder(new EmptyBorder(80, 30, 0, 30));
 		
+		// create icons
+		leftLabel = new JLabel(new ImageIcon(getClass().getClassLoader().
+				getResource("\\images\\guiGraphics\\header.png")));
+		rightLabel = new JLabel(new ImageIcon(getClass().getClassLoader().
+				getResource("\\images\\guiGraphics\\header.png")));
 		
+		// add the header components
+		panel.add(leftLabel, BorderLayout.WEST);
+		panel.add(rightLabel, BorderLayout.EAST);
+		
+		return panel;
+	}
+
+private void initHistory(JPanel history) {
+			// define placholder Emoji
+			Emoji placeholder = new Emoji("empty","guiGraphics",0);
+			emojiList = new Emoji[historySize];
+			
+			// loop though Emoji list: insert placeholder and add it as icon
+			for (int i = 0; i < emojiList.length; i++) {
+				emojiList[i] = placeholder; 
+				JLabel tempLab = new JLabel(new ImageIcon(getClass().getClassLoader().
+						getResource(emojiList[i].path)));
+				history.add(tempLab);
+			}
 		
 	}
-	
 /********************************************************************************
  *   							PROCESSING SECTION								*		
 ********************************************************************************/
-	
-
 
 
 	/**
