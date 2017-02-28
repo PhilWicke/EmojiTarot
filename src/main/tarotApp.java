@@ -16,6 +16,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.MalformedInputException;
 
 import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
@@ -24,6 +25,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
+import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
 
@@ -38,6 +40,7 @@ public class tarotApp {
 	static String[] unicodes 	= new String[751];
 	static String[] sentiScores = new String[751];
 	static String imagePath  	= "./images/";
+	static Emoji[] emojiList;
 	
 	// Set Emoji images path
 	private String emojiPath = "\\images\\faces\\";
@@ -47,9 +50,9 @@ public class tarotApp {
 	private JFrame mainFrame;
 	private JButton[] categories;
 	private JLabel header;
-	private JLabel leftIcon;
-	private JLabel rightIcon;
-
+	private JLabel descrip;
+	private JLabel leftLabel;
+	private JLabel rightLabel;
 	private JPanel history;
 	private JButton delete;
 	private JButton done;
@@ -104,20 +107,18 @@ public class tarotApp {
 			Dimension buttonSize = categories[0].getPreferredSize();
 			catPanel.setPreferredSize(new Dimension((int)(buttonSize.getWidth()),
 	                (int)(buttonSize.getHeight() * 10)+1 * 2));
-			
+			// category names
 			catNames[0] = "Faces";
 			catNames[1] = "Nature";
 			catNames[2] = "Objects";
 			catNames[3] = "Signs";
 
-			for(int i = 0; i < numCateg; i++)
-			{
+			for(int i = 0; i < numCateg; i++){
 				catPanel.add(categories[i]);
 			}
 			CatListener catListener = new CatListener();	
 
-			for(int i = 0; i < numCateg; i++)
-			{
+			for(int i = 0; i < numCateg; i++){
 				categories[i].addActionListener(catListener);
 			}			
 			return catPanel;
@@ -139,50 +140,93 @@ public class tarotApp {
 
 
 	private void makeStartWindow() {
+		
+		// Initialize main components
 		mainFrame = new JFrame();
 		mainFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		mainFrame.setUndecorated(true);
 		
 		JPanel topPanel = new JPanel(new BorderLayout());
+		JPanel cenPanel = new JPanel();
 		JPanel botPanel = new JPanel(new BorderLayout());
 		
 		mainFrame.getContentPane().add(topPanel, BorderLayout.PAGE_START);
+		mainFrame.getContentPane().add(cenPanel, BorderLayout.CENTER);
 		mainFrame.getContentPane().add(botPanel, BorderLayout.PAGE_END);
 		
+		// Description text
+		String descr = "<html><span style='font-size:18px'>Welcome to the Emoji handreading. Show me your Emoji and I tell you who you are. First, you take your smartphone and open you preferred messenging app. Now go to your history of Emoji and enter them into this program. Click through the categories to find at least 5 of your most used Emoji. If you are done, press <b>DONE</b> and wait for the magic to happen.</span></html>";
 		
-		// initialize components
-		header      = new JLabel("Emoji - Tarot");
+		// Initialize components
+		header      = new JLabel("Emoji - Palmistry", SwingConstants.CENTER);
+		descrip 	= new JLabel(descr);
 		categories	= new JButton[4];
 		delete	 	= new JButton("<-");
 		done 		= new JButton("DONE");
 		
 		// add the header components
 		topPanel.add(header, BorderLayout.CENTER);
-		header.setFont(new Font("Verdana",1,30));
-		topPanel.setBorder(new EmptyBorder(80, 30, 100, 30));
+		topPanel.add(descrip, BorderLayout.SOUTH);
 		
-		leftIcon = new JLabel(new ImageIcon(getClass().getClassLoader().
-				getResource("\\images\\objects\\2728.png")));
-		rightIcon = new JLabel(new ImageIcon(getClass().getClassLoader().
-				getResource("\\images\\objects\\1f52e.png")));
-		topPanel.add(leftIcon, BorderLayout.WEST);
-		topPanel.add(rightIcon, BorderLayout.EAST);
+		// configuration of header
+		header.setFont(new Font("Helvetica",1,45));
+		descrip.setBorder(new EmptyBorder(40, 0, 0, 0));
+		topPanel.setBorder(new EmptyBorder(80, 30, 40, 30));
+		// create icons
+		leftLabel = new JLabel(new ImageIcon(getClass().getClassLoader().
+				getResource("\\guiGraphics\\header.png")));
+		rightLabel = new JLabel(new ImageIcon(getClass().getClassLoader().
+				getResource("\\guiGraphics\\header.png")));
+		
+		// add the header components
+		topPanel.add(leftLabel, BorderLayout.WEST);
+		topPanel.add(rightLabel, BorderLayout.EAST);
+		
+		// define central panel
+		cenPanel.setLayout(new BoxLayout(cenPanel,BoxLayout.PAGE_AXIS));
+		history = new JPanel();
+		history.setLayout(new BoxLayout(history,BoxLayout.X_AXIS));
+		cenPanel.add(history);
+		
+		// test with a few Emoji
+		Emoji a = new Emoji("1f3c3","faces",0.5);
+		Emoji b = new Emoji("1f4a9","faces",0.7);
+		Emoji c = new Emoji("1f30a","nature",-0.2);
+		emojiList = new Emoji[3];
+		emojiList[0] = a;
+		emojiList[1] = b;
+		emojiList[2] = c;		
+		
+		for (int i = 0; i < emojiList.length; i++) {
+			JLabel tempLab = new JLabel(new ImageIcon(getClass().getClassLoader().
+					getResource(emojiList[i].path)));
+			history.add(tempLab);
+		}
+
+		history.setBorder(BorderFactory.createTitledBorder("Your Emoji History:"));
+		
+		cenPanel.setVisible(true);
 		
 		// add the category component
 		for(int i = 0; i < numCateg; i++){			
 			categories[i] = new JButton(catNames[i]);
-			//categories[i].setText((catNames[i]));
 		}
+		
+		// add bottom panel
 		botPanel.add(makeCatPanel());
+		
 		for(int i = 0; i < numCateg; i++){			
 			categories[i].setText((catNames[i]));
 		}
 		botPanel.setBorder( new EmptyBorder(0,80,100,80));
 		botPanel.setVisible(true);
 		
+		// add central 
+		
 		
 		
 		mainFrame.pack();
+		mainFrame.getContentPane().setBackground(Color.ORANGE);
 		mainFrame.setVisible(true);
 		
 		
