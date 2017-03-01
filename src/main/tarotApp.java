@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Toolkit;
@@ -109,7 +110,7 @@ public class tarotApp {
 			
 			Dimension buttonSize = categories[0].getPreferredSize();
 			catPanel.setPreferredSize(new Dimension((int)(buttonSize.getWidth()),
-	                (int)(buttonSize.getHeight() * 10)+1 * 2));
+	                (int)(buttonSize.getHeight() * 8)+1 * 2));
 			// category names
 			catNames[0] = "Faces";
 			catNames[1] = "Nature";
@@ -175,7 +176,6 @@ public class tarotApp {
 		botPanel = createBotPanel(botPanel);
 
 		mainFrame.pack();
-		mainFrame.getContentPane().setBackground(Color.ORANGE);
 		mainFrame.setVisible(true);		
 	}
 	
@@ -191,7 +191,7 @@ private JPanel createBotPanel(JPanel panel) {
 		for(int i = 0; i < numCateg; i++){			
 			categories[i].setText("<html><span style='font-size:15px'>"+catNames[i]+"</span></html>");
 		}
-		panel.setBorder( new EmptyBorder(0,80,200,80));
+		panel.setBorder( new EmptyBorder(0,80,250,80));
 		panel.setVisible(true);
 		return panel;
 	}
@@ -238,8 +238,8 @@ private JPanel createTopPanel(JPanel panel) {
 		panel.add(descrip, BorderLayout.SOUTH);
 		
 		header.setFont(new Font("Helvetica",1,45));
-		descrip.setBorder(new EmptyBorder(40, 0, 0, 0));
-		panel.setBorder(new EmptyBorder(80, 30, 0, 30));
+		descrip.setBorder(new EmptyBorder(35, 0, 0, 0));
+		panel.setBorder(new EmptyBorder(35, 30, 0, 30));
 		
 		// create icons
 		leftLabel = new JLabel(new ImageIcon(getClass().getClassLoader().
@@ -344,8 +344,8 @@ private void initHistory(JPanel history) {
 			ImageIcon buttonIcon = new ImageIcon(getClass().getClassLoader().
 					getResource(sourcePath));
 			Image buttonImage = buttonIcon.getImage();
-			buttonImage = buttonImage.getScaledInstance(buttonImage.getWidth(null)/2,
-					buttonImage.getHeight(null)/2, Image.SCALE_SMOOTH);
+			buttonImage = buttonImage.getScaledInstance(buttonImage.getWidth(null)/3,
+					buttonImage.getHeight(null)/3, Image.SCALE_SMOOTH);
 			buttonIcon.setImage(buttonImage);
 			// create button with icon
 			buttons[i] = new JButton(buttonIcon);
@@ -358,7 +358,8 @@ private void initHistory(JPanel history) {
 		
 		JPanel panel = new JPanel();
 		panel.setBorder(BorderFactory.createTitledBorder(categ));
-		panel.setLayout(new GridLayout(10, 10));
+		panel.setLayout(new GridLayout(10, 25));
+		//panel.setMaximumSize(new Dimension((int)SCREENWIDTH ,30));
 
 		for(int i = 0; i < num_emoji; i++)
 		{
@@ -380,8 +381,7 @@ private void initHistory(JPanel history) {
 			buttons[i].addActionListener(emojiListener);
 		}
 		goBack.addActionListener(emojiListener);
-		
-		panel.setMaximumSize(new Dimension((int)SCREENWIDTH ,30));
+
 		return panel;
 	}
 
