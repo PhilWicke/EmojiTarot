@@ -6,6 +6,8 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
@@ -32,6 +34,9 @@ import javax.swing.border.EmptyBorder;
  */
 public class tarotApp {
 	
+	final static Dimension SCREENRES = Toolkit.getDefaultToolkit().getScreenSize();
+	final static double SCREENWIDTH = SCREENRES.getWidth();
+	final static double SCREENHEIGHT = SCREENRES.getHeight();
 	static String[] unicodes 	= new String[751];
 	static String[] sentiScores = new String[751];
 	static String imagePath  	= "./images/";
@@ -39,11 +44,16 @@ public class tarotApp {
 	static int historySize = 18;
 	
 	// Set Emoji images path
-	private String emojiPath = "\\images\\faces\\";
+	private String emojiPath;
 	private int numCateg 	 = 4;
 	
 	// Define mainFrame 
 	private JFrame mainFrame;
+	private JPanel topPanel;
+	private JPanel cenPanel;
+	private JPanel botPanel;
+	private JPanel emoPanel;
+	
 	private JButton[] categories;
 	private JLabel header;
 	private JLabel descrip;
@@ -54,13 +64,14 @@ public class tarotApp {
 	private JButton done;
 	
 	private JButton[] buttons;
-	private JButton refresh;
+	private JButton goBack;
 	// category buttons
 	private JFrame frame;
 	
-	private File folder = new File("./Source/images/faces/");
-	private File[] listOfFiles = folder.listFiles();
-	private int num_emoji = listOfFiles.length - noPicNum(listOfFiles);
+	private String catPath = "./Source/images/";
+	//private File folder;
+	//private File[] listOfFiles;
+	private int num_emoji;
 	private String[] catNames = new String[numCateg];
 
 	
@@ -70,7 +81,7 @@ public class tarotApp {
 ********************************************************************************/
 	
 	public static void main(String[] args){
-		
+		System.out.println(SCREENRES);
 		loadData();
 		// init GUI
 		tarotApp app = new tarotApp();
@@ -100,10 +111,10 @@ public class tarotApp {
 			catPanel.setPreferredSize(new Dimension((int)(buttonSize.getWidth()),
 	                (int)(buttonSize.getHeight() * 10)+1 * 2));
 			// category names
-			catNames[0] = "<html><span style='font-size:15px'>Faces</span></html>";
-			catNames[1] = "<html><span style='font-size:15px'>Nature</span></html>";
-			catNames[2] = "<html><span style='font-size:15px'>Objects</span></html>";
-			catNames[3] = "<html><span style='font-size:15px'>Signs</span></html>";
+			catNames[0] = "Faces";
+			catNames[1] = "Nature";
+			catNames[2] = "Objects";
+			catNames[3] = "Signs";
 
 			for(int i = 0; i < numCateg; i++){
 				catPanel.add(categories[i]);
@@ -111,6 +122,7 @@ public class tarotApp {
 			CatListener catListener = new CatListener();	
 
 			for(int i = 0; i < numCateg; i++){
+				
 				categories[i].addActionListener(catListener);
 			}			
 			return catPanel;
@@ -120,31 +132,46 @@ public class tarotApp {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			for(int i = 0; i < numCateg; i++)
+			// identify choosen category
+			String categ = new String();
+			for(int i = 0; i < numCateg; i++){
 				if(e.getSource() == categories[i]) {
-					System.out.print(catNames[i]+ " chosen.");
+					categ = catNames[i];
 				}
+			}
+			emoPanel = makeEmojiPanel(categ);
+			mainFrame.remove(botPanel);
+			mainFrame.revalidate();
+			mainFrame.getContentPane().add(emoPanel, BorderLayout.PAGE_END);
+			mainFrame.revalidate();
+			mainFrame.repaint();
 		}
+			
+		
 
 	}
 
 
 	private void makeStartWindow() {
-
+		
+		System.out.println("Creating main frame...");
 		mainFrame = new JFrame();
 		mainFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		mainFrame.setUndecorated(true);
 		
-		JPanel topPanel = new JPanel(new BorderLayout());
-		JPanel cenPanel = new JPanel();
-		JPanel botPanel = new JPanel(new BorderLayout());
+		topPanel = new JPanel(new BorderLayout());
+		cenPanel = new JPanel();
+		botPanel = new JPanel(new BorderLayout());
 		
 		mainFrame.getContentPane().add(topPanel, BorderLayout.PAGE_START);
 		mainFrame.getContentPane().add(cenPanel, BorderLayout.CENTER);
 		mainFrame.getContentPane().add(botPanel, BorderLayout.PAGE_END);
 				
+		System.out.println("Creating top panel...");
 		topPanel = createTopPanel(topPanel);
+		System.out.println("Creating central panel...");
 		cenPanel = createCenPanel(cenPanel);
+		System.out.println("Creating bottom panel...");
 		botPanel = createBotPanel(botPanel);
 
 		mainFrame.pack();
@@ -157,12 +184,12 @@ private JPanel createBotPanel(JPanel panel) {
 		categories	= new JButton[4];
 		// add the category component
 		for(int i = 0; i < numCateg; i++){			
-			categories[i] = new JButton(catNames[i]);
+			categories[i] = new JButton();
 		}
 		// add bottom panel
 		panel.add(makeCatPanel());
 		for(int i = 0; i < numCateg; i++){			
-			categories[i].setText((catNames[i]));
+			categories[i].setText("<html><span style='font-size:15px'>"+catNames[i]+"</span></html>");
 		}
 		panel.setBorder( new EmptyBorder(0,80,200,80));
 		panel.setVisible(true);
@@ -285,13 +312,19 @@ private void initHistory(JPanel history) {
 	/**
 	 * Build interface
 	 */
-	private void makeComponents() {
-		frame = new JFrame("Emoji to Unicode - Keyboard");
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);		
+	private void loadCategoryImages(String category) {
+		
+		catPath = "./Source/images/"+category+"/";
+		emojiPath = "\\images\\"+category+"\\";
+		System.out.println(catPath);
+		File folder = new File(catPath);
+		File[] listOfFiles = folder.listFiles();
+		num_emoji = listOfFiles.length - noPicNum(listOfFiles);
+	
 		buttons = new JButton[num_emoji];
-		refresh = new JButton("X");
-		refresh.setBackground(Color.RED);
-		refresh.setOpaque(true);
+		goBack = new JButton("RETURN");
+		goBack.setBackground(Color.RED);
+		goBack.setOpaque(true);
 	
 		String tempfile;
 		for (int i = 0; i < listOfFiles.length; i++) {
@@ -307,30 +340,38 @@ private void initHistory(JPanel history) {
 		
 		for(int i = 0; i < num_emoji; i++){
 			String sourcePath = emojiPath+unicodes[i]+".png";
-			
-			buttons[i] = new JButton(new ImageIcon(getClass().getClassLoader().
-					getResource(sourcePath)));
+			// retrieve icon and adjust size
+			ImageIcon buttonIcon = new ImageIcon(getClass().getClassLoader().
+					getResource(sourcePath));
+			Image buttonImage = buttonIcon.getImage();
+			buttonImage = buttonImage.getScaledInstance(buttonImage.getWidth(null)/2,
+					buttonImage.getHeight(null)/2, Image.SCALE_SMOOTH);
+			buttonIcon.setImage(buttonImage);
+			// create button with icon
+			buttons[i] = new JButton(buttonIcon);
 		}
 	}
 
 
-	private JPanel makeEmojiPanel() {
+	private JPanel makeEmojiPanel(String categ) {
+		loadCategoryImages(categ);
+		
 		JPanel panel = new JPanel();
-		panel.setBorder(BorderFactory.createTitledBorder("Emoji"));
+		panel.setBorder(BorderFactory.createTitledBorder(categ));
 		panel.setLayout(new GridLayout(10, 10));
 
 		for(int i = 0; i < num_emoji; i++)
 		{
 			panel.add(buttons[i]);
 		}
-		panel.add(refresh);
+		panel.add(goBack);
 		
 		ButtonGroup bg = new ButtonGroup();
 		for(int i = 0; i < num_emoji; i++)
 		{
 			bg.add(buttons[i]);
 		}
-		bg.add(refresh);
+		bg.add(goBack);
 
 		EmojiListener emojiListener = new EmojiListener();
 
@@ -338,14 +379,10 @@ private void initHistory(JPanel history) {
 		{
 			buttons[i].addActionListener(emojiListener);
 		}
-		refresh.addActionListener(emojiListener);
+		goBack.addActionListener(emojiListener);
 		
+		panel.setMaximumSize(new Dimension((int)SCREENWIDTH ,30));
 		return panel;
-	}
-
-	private void makeLayout() {
-		frame.add(makeEmojiPanel());
-		frame.pack();
 	}
 
 	private void setVisible() {
@@ -358,11 +395,21 @@ private void initHistory(JPanel history) {
 		public void actionPerformed(ActionEvent e) {
 			for(int i = 0; i < num_emoji; i++)
 				if(e.getSource() == buttons[i]) {
+					// TODO: Emoji Button functionality
 					System.out.print(unicodes[i]+ " ");
 				}
-				else if(e.getSource() == refresh){
-					System.out.println();
+				else if(e.getSource() == goBack){
+					callMainFrame();
 				}
+		}
+
+		private void callMainFrame() {
+			mainFrame.remove(emoPanel);
+			mainFrame.revalidate();
+			mainFrame.getContentPane().add(botPanel, BorderLayout.PAGE_END);
+			mainFrame.revalidate();
+			mainFrame.repaint();
+			
 		}
 
 	}
