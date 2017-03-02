@@ -38,8 +38,11 @@ public class tarotApp {
 	final static Dimension SCREENRES = Toolkit.getDefaultToolkit().getScreenSize();
 	final static double SCREENWIDTH = SCREENRES.getWidth();
 	final static double SCREENHEIGHT = SCREENRES.getHeight();
-	static String[] unicodes 	= new String[751];
+	
+	static String[] sentiCodes 	= new String[751];
 	static String[] sentiScores = new String[751];
+	
+	static String[] unicodes = new String[800];
 	static String imagePath  	= "./images/";
 	static Emoji[] emojiList;
 	static int historySize = 18;
@@ -47,6 +50,7 @@ public class tarotApp {
 	// Set Emoji images path
 	private String emojiPath;
 	private int numCateg 	 = 4;
+	private String currentCat;
 	
 	// Define mainFrame 
 	private JFrame mainFrame;
@@ -64,7 +68,11 @@ public class tarotApp {
 	private JButton delete;
 	private JButton done;
 	
-	private JButton[] buttons;
+	private JButton[] buttonsFaces;
+	private JButton[] buttonsNature;
+	private JButton[] buttonsObjects;
+	private JButton[] buttonsSigns;
+	
 	private JButton goBack;
 	// category buttons
 	private JFrame frame;
@@ -83,6 +91,7 @@ public class tarotApp {
 	
 	public static void main(String[] args){
 		loadData();
+		
 		// init GUI
 		tarotApp app = new tarotApp();
 		app.makeStartWindow();
@@ -115,6 +124,13 @@ public class tarotApp {
 			catNames[1] = "Nature";
 			catNames[2] = "Objects";
 			catNames[3] = "Signs";
+			
+			// preload buttons
+			for(int i = 0; i < numCateg; i++){
+				System.out.println("Loading >"+catNames[i]+"< buttons.");
+				currentCat = catNames[i];
+				loadCategoryImages();
+			}
 
 			for(int i = 0; i < numCateg; i++){
 				catPanel.add(categories[i]);
@@ -133,13 +149,12 @@ public class tarotApp {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			// identify choosen category
-			String categ = new String();
 			for(int i = 0; i < numCateg; i++){
 				if(e.getSource() == categories[i]) {
-					categ = catNames[i];
+					currentCat = catNames[i];
 				}
 			}
-			emoPanel = makeEmojiPanel(categ);
+			emoPanel = makeEmojiPanel();
 			mainFrame.remove(botPanel);
 			mainFrame.revalidate();
 			mainFrame.getContentPane().add(emoPanel, BorderLayout.PAGE_END);
@@ -267,6 +282,26 @@ private void initHistory(JPanel history) {
 			}
 		
 	}
+
+private void addToHistory(String string) {
+//	Component emojiIcon = null;
+//	
+//	history.removeAll();
+//	history.add(emojiIcon);
+//	
+//	
+//	Emoji placeholder = new Emoji("empty","guiGraphics",0);
+//	emojiList = new Emoji[historySize];
+//	
+//	// loop though Emoji list: insert placeholder and add it as icon
+//	for (int i = 0; i < emojiList.length; i++) {
+//		emojiList[i] = placeholder; 
+//		JLabel tempLab = new JLabel(new ImageIcon(getClass().getClassLoader().
+//				getResource(emojiList[i].path)));
+//		history.add(tempLab);
+//	}
+	
+}
 /********************************************************************************
  *   							PROCESSING SECTION								*		
 ********************************************************************************/
@@ -311,10 +346,12 @@ private void initHistory(JPanel history) {
 	/**
 	 * Build interface
 	 */
-	private void loadCategoryImages(String category) {
-		
-		catPath = "./Source/images/"+category+"/";
-		emojiPath = "\\images\\"+category+"\\";
+	private void loadCategoryImages() {
+		// aim at correct button field
+		JButton[] buttons = null;
+
+		catPath = "./Source/images/"+currentCat+"/";
+		emojiPath = "\\images\\"+currentCat+"\\";
 		File folder = new File(catPath);
 		File[] listOfFiles = folder.listFiles();
 		num_emoji = listOfFiles.length - noPicNum(listOfFiles);
@@ -348,14 +385,52 @@ private void initHistory(JPanel history) {
 			// create button with icon
 			buttons[i] = new JButton(buttonIcon);
 		}
+		setButtonsCat(buttons);
 	}
 
+	private void setButtonsCat(JButton[] buttons) {
+		switch (currentCat) {
+		case "Faces":
+			buttonsFaces = buttons;break;
+		case "Nature":
+			buttonsNature = buttons;break;
+		case "Objects":
+			buttonsObjects = buttons;break;
+		case "Signs":
+			buttonsSigns = buttons;break;
+		default:
+			break;
+		}
+	}
 
-	private JPanel makeEmojiPanel(String categ) {
-		loadCategoryImages(categ);
+	private JButton[] getButtonsCat(JButton[] buttons) {
+		switch (currentCat) {
+		case "Faces":
+			buttons = buttonsFaces;break;
+		case "Nature":
+			buttons = buttonsNature;break;
+		case "Objects":
+			buttons = buttonsObjects;break;
+		case "Signs":
+			buttons = buttonsSigns;break;
+		default:
+			break;
+		}
+		return buttons;
+	}
+
+	private JPanel makeEmojiPanel() {
+		JButton[] buttons = null;
+		buttons = getButtonsCat(buttons);
+		
+		catPath = "./Source/images/"+currentCat+"/";
+		emojiPath = "\\images\\"+currentCat+"\\";
+		File folder = new File(catPath);
+		File[] listOfFiles = folder.listFiles();
+		num_emoji = listOfFiles.length - noPicNum(listOfFiles);
 		
 		JPanel panel = new JPanel();
-		panel.setBorder(BorderFactory.createTitledBorder(categ));
+		panel.setBorder(BorderFactory.createTitledBorder(currentCat));
 		panel.setLayout(new GridLayout(10, 25));
 		//panel.setMaximumSize(new Dimension((int)SCREENWIDTH ,30));
 
@@ -388,6 +463,9 @@ private void initHistory(JPanel history) {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
+			JButton[] buttons = null;
+			buttons = getButtonsCat(buttons);
+			
 			for(int i = 0; i < num_emoji; i++)
 				if(e.getSource() == buttons[i]) {
 					addToHistory(unicodes[i]);
@@ -400,25 +478,6 @@ private void initHistory(JPanel history) {
 				}
 		}
 
-		private void addToHistory(String string) {
-			Component emojiIcon = null;
-			
-			history.removeAll();
-			history.add(emojiIcon);
-			
-			
-			Emoji placeholder = new Emoji("empty","guiGraphics",0);
-			emojiList = new Emoji[historySize];
-			
-			// loop though Emoji list: insert placeholder and add it as icon
-			for (int i = 0; i < emojiList.length; i++) {
-				emojiList[i] = placeholder; 
-				JLabel tempLab = new JLabel(new ImageIcon(getClass().getClassLoader().
-						getResource(emojiList[i].path)));
-				history.add(tempLab);
-			}
-			
-		}
 
 		private void callMainFrame() {
 			mainFrame.remove(emoPanel);
@@ -438,6 +497,7 @@ private void initHistory(JPanel history) {
 	 * and the processed data is stored in sentiWeb.txt
 	 */
 	private static void loadData() {
+		
 		int count = 0;
 		String line;
 		try {
@@ -446,14 +506,14 @@ private void initHistory(JPanel history) {
 			
 	        while((line=br.readLine())!=null){
 	        	String[] lineData = line.split("\t");
-	        	unicodes[count] = lineData[2];
+	        	sentiCodes[count] = lineData[2];
 	        	sentiScores[count] = lineData[8];
 	        	count++;
 	        }
 		br.close();
 		} catch (Exception e) {
 			e.printStackTrace();
-		}		
+		}	
 	}
 
 }
