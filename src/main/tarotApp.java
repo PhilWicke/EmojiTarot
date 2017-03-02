@@ -40,7 +40,7 @@ public class tarotApp {
 	final static double SCREENHEIGHT = SCREENRES.getHeight();
 	
 	static String[] sentiCodes 	= new String[751];
-	static String[] sentiScores = new String[751];
+	static double[] sentiScores = new double[751];
 	
 	static String[] unicodes = new String[800];
 	static String imagePath  	= "./images/";
@@ -283,7 +283,15 @@ private void initHistory(JPanel history) {
 		
 	}
 
-private void addToHistory(String string) {
+private void addToHistory(String unicode) {
+	for (int i = 0; i < sentiCodes.length; i++) {
+		if(unicode == sentiCodes[i]){
+			Emoji emoji = new Emoji(unicode,currentCat,sentiScores[i]);
+		}
+		
+		emojiList = new Emoji[historySize];
+		
+	}
 //	Component emojiIcon = null;
 //	
 //	history.removeAll();
@@ -470,7 +478,6 @@ private void addToHistory(String string) {
 				if(e.getSource() == buttons[i]) {
 					addToHistory(unicodes[i]);
 					buttons[i].setEnabled(false);
-					// TODO: Buttons outsourcing so they stay locked 
 					System.out.print(unicodes[i]+ " ");
 				}
 				else if(e.getSource() == goBack){
@@ -507,7 +514,7 @@ private void addToHistory(String string) {
 	        while((line=br.readLine())!=null){
 	        	String[] lineData = line.split("\t");
 	        	sentiCodes[count] = lineData[2];
-	        	sentiScores[count] = lineData[8];
+	        	sentiScores[count] = Double.parseDouble(lineData[8]);
 	        	count++;
 	        }
 		br.close();
