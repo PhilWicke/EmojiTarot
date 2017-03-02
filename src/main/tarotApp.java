@@ -82,7 +82,6 @@ public class tarotApp {
 ********************************************************************************/
 	
 	public static void main(String[] args){
-		System.out.println(SCREENRES);
 		loadData();
 		// init GUI
 		tarotApp app = new tarotApp();
@@ -316,13 +315,12 @@ private void initHistory(JPanel history) {
 		
 		catPath = "./Source/images/"+category+"/";
 		emojiPath = "\\images\\"+category+"\\";
-		System.out.println(catPath);
 		File folder = new File(catPath);
 		File[] listOfFiles = folder.listFiles();
 		num_emoji = listOfFiles.length - noPicNum(listOfFiles);
 	
 		buttons = new JButton[num_emoji];
-		goBack = new JButton("RETURN");
+		goBack = new JButton("↩");
 		goBack.setBackground(Color.RED);
 		goBack.setOpaque(true);
 	
@@ -385,9 +383,6 @@ private void initHistory(JPanel history) {
 		return panel;
 	}
 
-	private void setVisible() {
-		frame.setVisible(true);
-	}
 
 	public class EmojiListener implements ActionListener {
 
@@ -395,12 +390,34 @@ private void initHistory(JPanel history) {
 		public void actionPerformed(ActionEvent e) {
 			for(int i = 0; i < num_emoji; i++)
 				if(e.getSource() == buttons[i]) {
-					// TODO: Emoji Button functionality
+					addToHistory(unicodes[i]);
+					buttons[i].setEnabled(false);
+					// TODO: Buttons outsourcing so they stay locked 
 					System.out.print(unicodes[i]+ " ");
 				}
 				else if(e.getSource() == goBack){
 					callMainFrame();
 				}
+		}
+
+		private void addToHistory(String string) {
+			Component emojiIcon = null;
+			
+			history.removeAll();
+			history.add(emojiIcon);
+			
+			
+			Emoji placeholder = new Emoji("empty","guiGraphics",0);
+			emojiList = new Emoji[historySize];
+			
+			// loop though Emoji list: insert placeholder and add it as icon
+			for (int i = 0; i < emojiList.length; i++) {
+				emojiList[i] = placeholder; 
+				JLabel tempLab = new JLabel(new ImageIcon(getClass().getClassLoader().
+						getResource(emojiList[i].path)));
+				history.add(tempLab);
+			}
+			
 		}
 
 		private void callMainFrame() {
