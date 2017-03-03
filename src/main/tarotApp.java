@@ -69,10 +69,16 @@ public class tarotApp {
 	private JButton delete;
 	private JButton done;
 	
+	// Four categories with data fields for 
+	// buttons and unicodes
 	private JButton[] buttonsFaces;
+	private String[] unicodesFaces;
 	private JButton[] buttonsNature;
+	private String[] unicodesNature;
 	private JButton[] buttonsObjects;
+	private String[] unicodesObjects;
 	private JButton[] buttonsSigns;
+	private String[] unicodesSigns;
 	private JButton goBack;
 	
 	private String catPath = "./Source/images/";
@@ -159,6 +165,50 @@ public class tarotApp {
 			mainFrame.repaint();
 		}
 	}
+	
+	public class EmojiListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			JButton[] buttons = null;
+			buttons = getButtonsCat(buttons);
+			unicodes = getUnicodesCat(unicodes);
+			
+			for(int i = 0; i < num_emoji; i++)
+				if(e.getSource() == buttons[i]) {
+					addToHistory(unicodes[i]);
+					buttons[i].setEnabled(false);
+					System.out.print(unicodes[i]+ " ");
+				}
+				else if(e.getSource() == goBack){
+					callMainFrame();
+				}
+			// block all buttons if history is full
+			if (emojiHist.isFull()){
+				openAllButtons(false);
+			}
+		}
+	}
+	
+	private class deleteListener implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			history.removeAll();
+			initHistory(history);
+			emojiHist.clear();
+			emojiHist.fillPlaceholder();
+			openAllButtons(true);
+			history.revalidate();
+			history.repaint();
+		}
+	}
+
+	private class doneListener implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+				
+		}
+	}
 
 
 	private void makeStartWindow() {
@@ -212,6 +262,10 @@ private JPanel createCenPanel(JPanel panel) {
 				getResource("\\images\\guiGraphics\\del.png")));
         delete.setBorder(null);
         delete.setContentAreaFilled(false);
+        
+        deleteListener delListener = new deleteListener();	
+		delete.addActionListener(delListener);
+        
 		// Create the done button
 		done 		= new JButton();
 		done.setIcon(new ImageIcon(getClass().getClassLoader().
@@ -219,6 +273,9 @@ private JPanel createCenPanel(JPanel panel) {
 		done.setBorder(null);
         done.setContentAreaFilled(false);
 		
+        doneListener dListener = new doneListener();
+        done.addActionListener(dListener);
+        
 		// define central panel
 		panel.setLayout(new BoxLayout(panel,BoxLayout.LINE_AXIS));
 		history = new JPanel();
@@ -365,7 +422,8 @@ private void addToHistory(String unicode) {
 		goBack = new JButton("↩");
 		goBack.setBackground(Color.RED);
 		goBack.setOpaque(true);
-	
+		
+		String[] catUnicodes = new String[400];
 		String tempfile;
 		for (int i = 0; i < listOfFiles.length; i++) {
 			if (listOfFiles[i].isFile()) {
@@ -373,13 +431,14 @@ private void addToHistory(String unicode) {
 				if(tempfile.contains(".png")){
 					String[] parts 	= tempfile.split(".png");
 					String unicode 	= parts[0];
-					unicodes[i] 		= unicode;
+					catUnicodes[i] 		= unicode;
 				}
 			}
 		}
+		setUnicodesCat(catUnicodes);
 		
 		for(int i = 0; i < num_emoji; i++){
-			String sourcePath = emojiPath+unicodes[i]+".png";
+			String sourcePath = emojiPath+catUnicodes[i]+".png";
 			// retrieve icon and adjust size
 			ImageIcon buttonIcon = new ImageIcon(getClass().getClassLoader().
 					getResource(sourcePath));
@@ -424,6 +483,37 @@ private void addToHistory(String unicode) {
 		return buttons;
 	}
 
+	private void setUnicodesCat(String[] unicodes) {
+		switch (currentCat) {
+		case "Faces":
+			unicodesFaces = unicodes;break;
+		case "Nature":
+			unicodesNature = unicodes;break;
+		case "Objects":
+			unicodesObjects = unicodes;break;
+		case "Signs":
+			unicodesSigns = unicodes;break;
+		default:
+			break;
+		}
+	}
+	
+	private String[] getUnicodesCat(String[] unicodes) {
+		switch (currentCat) {
+		case "Faces":
+			unicodes = unicodesFaces;break;
+		case "Nature":
+			unicodes = unicodesNature;break;
+		case "Objects":
+			unicodes = unicodesObjects;break;
+		case "Signs":
+			unicodes = unicodesSigns;break;
+		default:
+			break;
+		}
+		return unicodes;
+	}
+
 	private JPanel makeEmojiPanel() {
 		JButton[] buttons = null;
 		buttons = getButtonsCat(buttons);
@@ -462,42 +552,18 @@ private void addToHistory(String unicode) {
 
 		return panel;
 	}
-
-
-	public class EmojiListener implements ActionListener {
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			JButton[] buttons = null;
-			buttons = getButtonsCat(buttons);
-			
-			for(int i = 0; i < num_emoji; i++)
-				if(e.getSource() == buttons[i]) {
-					addToHistory(unicodes[i]);
-					buttons[i].setEnabled(false);
-					System.out.print(unicodes[i]+ " ");
-				}
-				else if(e.getSource() == goBack){
-					callMainFrame();
-				}
-			// block all buttons if history is full
-			if (emojiHist.isFull()){
-				blockAllButtons(false);
-			}
-		}
-
-		private void callMainFrame() {
-			mainFrame.remove(emoPanel);
-			mainFrame.revalidate();
-			mainFrame.getContentPane().add(botPanel, BorderLayout.PAGE_END);
-			mainFrame.revalidate();
-			mainFrame.repaint();
-			
-		}
-
+	
+	
+	private void callMainFrame() {
+		mainFrame.remove(emoPanel);
+		mainFrame.revalidate();
+		mainFrame.getContentPane().add(botPanel, BorderLayout.PAGE_END);
+		mainFrame.revalidate();
+		mainFrame.repaint();
+		
 	}
 
-	private void blockAllButtons(boolean status) {
+	private void openAllButtons(boolean status) {
 		for (JButton jButton : buttonsFaces) {
 			jButton.setEnabled(status);
 		}
