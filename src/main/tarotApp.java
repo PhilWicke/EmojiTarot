@@ -5,7 +5,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Toolkit;
@@ -17,7 +16,6 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
-import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -52,6 +50,7 @@ public class tarotApp {
 	private String emojiPath;
 	private int numCateg 	 = 4;
 	private String currentCat;
+	private String lastCat;
 	
 	// Define mainFrame 
 	private JFrame mainFrame;
@@ -82,8 +81,6 @@ public class tarotApp {
 	private JButton goBack;
 	
 	private String catPath = "./Source/images/";
-	//private File folder;
-	//private File[] listOfFiles;
 	private int num_emoji;
 	private String[] catNames = new String[numCateg];
 
@@ -135,7 +132,7 @@ public class tarotApp {
 				currentCat = catNames[i];
 				loadCategoryImages();
 			}
-
+			
 			for(int i = 0; i < numCateg; i++){
 				catPanel.add(categories[i]);
 			}
@@ -151,12 +148,13 @@ public class tarotApp {
 	private class CatListener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			// identify choosen category
+			// identify chosen category
 			for(int i = 0; i < numCateg; i++){
 				if(e.getSource() == categories[i]) {
 					currentCat = catNames[i];
 				}
 			}
+			
 			emoPanel = makeEmojiPanel();
 			mainFrame.remove(botPanel);
 			mainFrame.revalidate();
@@ -174,7 +172,7 @@ public class tarotApp {
 			buttons = getButtonsCat(buttons);
 			unicodes = getUnicodesCat(unicodes);
 			
-			for(int i = 0; i < num_emoji; i++)
+			for(int i = 0; i < num_emoji; i++){
 				if(e.getSource() == buttons[i]) {
 					addToHistory(unicodes[i]);
 					buttons[i].setEnabled(false);
@@ -183,6 +181,7 @@ public class tarotApp {
 				else if(e.getSource() == goBack){
 					callMainFrame();
 				}
+			}
 			// block all buttons if history is full
 			if (emojiHist.isFull()){
 				openAllButtons(false);
@@ -448,6 +447,10 @@ private void addToHistory(String unicode) {
 			buttonIcon.setImage(buttonImage);
 			// create button with icon
 			buttons[i] = new JButton(buttonIcon);
+		} 
+		EmojiListener emojiListener = new EmojiListener();
+		for(int i = 0; i < num_emoji; i++){
+			buttons[i].addActionListener(emojiListener);
 		}
 		setButtonsCat(buttons);
 	}
@@ -515,6 +518,7 @@ private void addToHistory(String unicode) {
 	}
 
 	private JPanel makeEmojiPanel() {
+
 		JButton[] buttons = null;
 		buttons = getButtonsCat(buttons);
 		
@@ -527,29 +531,15 @@ private void addToHistory(String unicode) {
 		JPanel panel = new JPanel();
 		panel.setBorder(BorderFactory.createTitledBorder(currentCat));
 		panel.setLayout(new GridLayout(10, 25));
-		//panel.setMaximumSize(new Dimension((int)SCREENWIDTH ,30));
-
+		
 		for(int i = 0; i < num_emoji; i++)
 		{
 			panel.add(buttons[i]);
 		}
 		panel.add(goBack);
-		
-		ButtonGroup bg = new ButtonGroup();
-		for(int i = 0; i < num_emoji; i++)
-		{
-			bg.add(buttons[i]);
-		}
-		bg.add(goBack);
 
 		EmojiListener emojiListener = new EmojiListener();
-
-		for(int i = 0; i < num_emoji; i++)
-		{
-			buttons[i].addActionListener(emojiListener);
-		}
 		goBack.addActionListener(emojiListener);
-
 		return panel;
 	}
 	
