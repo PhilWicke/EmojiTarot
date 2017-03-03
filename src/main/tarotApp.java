@@ -44,7 +44,8 @@ public class tarotApp {
 	
 	static String[] unicodes = new String[800];
 	static String imagePath  	= "./images/";
-	static Emoji[] emojiList;
+	//static Emoji[] emojiList;
+	static EmojiHistory emojiHist;
 	static int historySize = 18;
 	
 	// Set Emoji images path
@@ -72,10 +73,7 @@ public class tarotApp {
 	private JButton[] buttonsNature;
 	private JButton[] buttonsObjects;
 	private JButton[] buttonsSigns;
-	
 	private JButton goBack;
-	// category buttons
-	private JFrame frame;
 	
 	private String catPath = "./Source/images/";
 	//private File folder;
@@ -145,7 +143,6 @@ public class tarotApp {
 	}
 
 	private class CatListener implements ActionListener {
-
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			// identify choosen category
@@ -161,9 +158,6 @@ public class tarotApp {
 			mainFrame.revalidate();
 			mainFrame.repaint();
 		}
-			
-		
-
 	}
 
 
@@ -193,7 +187,7 @@ public class tarotApp {
 		mainFrame.setVisible(true);		
 	}
 	
-private JPanel createBotPanel(JPanel panel) {
+	private JPanel createBotPanel(JPanel panel) {
 		// Initialize components
 		categories	= new JButton[4];
 		// add the category component
@@ -269,47 +263,50 @@ private JPanel createTopPanel(JPanel panel) {
 	}
 
 private void initHistory(JPanel history) {
-			// define placholder Emoji
-			Emoji placeholder = new Emoji("empty","guiGraphics",0);
-			emojiList = new Emoji[historySize];
-			
-			// loop though Emoji list: insert placeholder and add it as icon
-			for (int i = 0; i < emojiList.length; i++) {
-				emojiList[i] = placeholder; 
-				JLabel tempLab = new JLabel(new ImageIcon(getClass().getClassLoader().
-						getResource(emojiList[i].path)));
-				history.add(tempLab);
-			}
-		
+	// define placholder Emoji
+	emojiHist = new EmojiHistory(historySize);
+	emojiHist.fillPlaceholder();
+	
+	// loop though Emoji list: insert placeholder and add it as icon
+	for (int i = 0; i < emojiHist.size(); i++) {
+		JLabel tempLab = new JLabel(new ImageIcon(getClass().getClassLoader().
+				getResource(emojiHist.get(i).path)));
+		history.add(tempLab);
 	}
 
+}
+
 private void addToHistory(String unicode) {
+	boolean hasSentiCode = false;
 	for (int i = 0; i < sentiCodes.length; i++) {
-		if(unicode == sentiCodes[i]){
+		//System.out.println("Comparing: "+unicode+" and "+sentiCodes[i]);
+		if(unicode.equals(sentiCodes[i])){
 			Emoji emoji = new Emoji(unicode,currentCat,sentiScores[i]);
+			emojiHist.removeAllPlaceholder();
+			emojiHist.add(emoji);
+			emojiHist.fillPlaceholder();
+			hasSentiCode = true;
 		}
-		
-		emojiList = new Emoji[historySize];
-		
 	}
-//	Component emojiIcon = null;
-//	
-//	history.removeAll();
-//	history.add(emojiIcon);
-//	
-//	
-//	Emoji placeholder = new Emoji("empty","guiGraphics",0);
-//	emojiList = new Emoji[historySize];
-//	
-//	// loop though Emoji list: insert placeholder and add it as icon
-//	for (int i = 0; i < emojiList.length; i++) {
-//		emojiList[i] = placeholder; 
-//		JLabel tempLab = new JLabel(new ImageIcon(getClass().getClassLoader().
-//				getResource(emojiList[i].path)));
-//		history.add(tempLab);
-//	}
+	if(!hasSentiCode){
+			Emoji emoji = new Emoji(unicode,currentCat,0);
+			emojiHist.removeAllPlaceholder();
+			emojiHist.add(emoji);
+			emojiHist.fillPlaceholder();
+		}
+	// create labels 
+	history.removeAll();
+	for (int i = 0; i < emojiHist.size(); i++) {
+		JLabel tempLab = new JLabel(new ImageIcon(getClass().getClassLoader().
+				getResource(emojiHist.get(i).path)));
+		history.add(tempLab);
+	}
+	history.revalidate();
+	history.repaint();
 	
 }
+
+
 /********************************************************************************
  *   							PROCESSING SECTION								*		
 ********************************************************************************/
@@ -483,8 +480,11 @@ private void addToHistory(String unicode) {
 				else if(e.getSource() == goBack){
 					callMainFrame();
 				}
+			// block all buttons if history is full
+			if (emojiHist.isFull()){
+				blockAllButtons(false);
+			}
 		}
-
 
 		private void callMainFrame() {
 			mainFrame.remove(emoPanel);
@@ -495,6 +495,21 @@ private void addToHistory(String unicode) {
 			
 		}
 
+	}
+
+	private void blockAllButtons(boolean status) {
+		for (JButton jButton : buttonsFaces) {
+			jButton.setEnabled(status);
+		}
+		for (JButton jButton : buttonsNature) {
+			jButton.setEnabled(status);
+		}
+		for (JButton jButton : buttonsObjects) {
+			jButton.setEnabled(status);
+		}
+		for (JButton jButton : buttonsSigns) {
+			jButton.setEnabled(status);
+		}
 	}
 
 
