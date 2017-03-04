@@ -205,7 +205,7 @@ public class tarotApp {
 	private class doneListener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-				
+				evaluate(emojiHist);
 		}
 	}
 
@@ -236,6 +236,11 @@ public class tarotApp {
 		mainFrame.setVisible(true);		
 	}
 	
+	public void evaluate(EmojiHistory emojiHist2) {
+		// TODO Auto-generated method stub
+		
+	}
+
 	private JPanel createBotPanel(JPanel panel) {
 		// Initialize components
 		categories	= new JButton[4];
