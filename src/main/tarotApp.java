@@ -10,6 +10,8 @@ import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputMethodEvent;
+import java.awt.event.InputMethodListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -21,7 +23,10 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSlider;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
 
@@ -57,6 +62,7 @@ public class tarotApp {
 	private JPanel topPanel;
 	private JPanel cenPanel;
 	private JPanel botPanel;
+	private JPanel evalPanel;
 	private JPanel emoPanel;
 	
 	private JButton[] categories;
@@ -205,7 +211,7 @@ public class tarotApp {
 	private class doneListener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-				evaluate(emojiHist);
+				evaluate();
 		}
 	}
 
@@ -236,9 +242,43 @@ public class tarotApp {
 		mainFrame.setVisible(true);		
 	}
 	
-	public void evaluate(EmojiHistory emojiHist2) {
-		// TODO Auto-generated method stub
+	public void evaluate() {
 		
+		// TODO
+		int meanSenti = 30;
+		
+		evalPanel = new JPanel(new BorderLayout());
+		JSlider slider = new JSlider(JSlider.VERTICAL, -100, 100, meanSenti);
+
+		slider.setEnabled(false);
+		slider.setMinorTickSpacing(5);
+		slider.setMajorTickSpacing(10);
+		slider.setPaintTicks(true);
+		slider.setPaintTrack(true);
+		slider.setPaintLabels(true);
+		slider.setToolTipText("Emoji Sentiment Score: "+meanSenti);
+		
+		MySliderUI gradientUI = new MySliderUI(slider);
+		float[] gradient = {0.0f, 0.2f, 0.4f, 0.6f, 0.8f, 1.0f};
+		gradientUI.setColorRange(gradient);
+		slider.setUI(new MySliderUI(slider));
+		
+		evalPanel.add(slider, BorderLayout.WEST);
+		
+		
+		mainFrame.remove(botPanel);
+		mainFrame.revalidate();
+		mainFrame.getContentPane().add(evalPanel, BorderLayout.PAGE_END);
+		mainFrame.revalidate();
+		mainFrame.repaint();
+		
+		
+	}
+
+	private JPanel createEvalPanel(JPanel evalPanel) {
+		JSlider slider = new JSlider(JSlider.VERTICAL, -100, 100, 15);
+		evalPanel.add(slider);
+		return null;
 	}
 
 	private JPanel createBotPanel(JPanel panel) {
