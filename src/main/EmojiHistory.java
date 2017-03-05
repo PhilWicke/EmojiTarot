@@ -40,4 +40,12 @@ public class EmojiHistory extends ArrayList<Emoji>{
 	public boolean isFull() {
 		return !(this.get(maxSize-1).unicode.equals("empty"));
 	}
+	
+	public boolean isEmpty(){
+		return this.get(0).unicode.equals("empty");
+	}
+	
+	public boolean atLeastFive(){
+		return this.get(4).unicode.equals("empty");
+	}
 }

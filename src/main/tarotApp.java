@@ -5,8 +5,10 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Image;
+import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -31,6 +33,7 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 import javax.swing.plaf.metal.OceanTheme;
@@ -75,7 +78,7 @@ public class tarotApp {
 	private JPanel topPanel;
 	private JPanel cenPanel;
 	private JPanel botPanel;
-	private JPanel evalPanel;
+	private JSplitPane evalPanel;
 	private JPanel emoPanel;
 	
 	private JButton[] categories;
@@ -86,6 +89,7 @@ public class tarotApp {
 	private JPanel history;
 	private JButton delete;
 	private JButton done;
+	private JButton restart;
 	
 	// Four categories with data fields for 
 	// buttons and unicodes
@@ -208,6 +212,42 @@ public class tarotApp {
 		}
 	}
 	
+	private class restartListener implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			history.removeAll();
+			initHistory(history);
+			emojiHist.clear();
+			emojiHist.fillPlaceholder();
+			openAllButtons(true);
+			history.revalidate();
+			history.repaint();
+			
+			// rebuild done button
+			done 		= new JButton();
+			done.setIcon(new ImageIcon(getClass().getClassLoader().
+					getResource("\\images\\guiGraphics\\ok.png")));
+			done.setBorder(null);
+	        done.setContentAreaFilled(false);
+			
+	        doneListener dListener = new doneListener();
+	        done.addActionListener(dListener);
+	        
+			cenPanel.remove(restart);
+			cenPanel.add(done);
+			delete.setEnabled(true);
+			
+			
+			mainFrame.getContentPane().remove(evalPanel);
+			botPanel = new JPanel(new BorderLayout());
+			//TODO
+			mainFrame.getContentPane().add(botPanel, BorderLayout.PAGE_END);
+			botPanel = createBotPanel(botPanel);
+			cenPanel.revalidate();
+			cenPanel.repaint();
+		}
+	}
+	
 	private class deleteListener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
@@ -224,7 +264,35 @@ public class tarotApp {
 	private class doneListener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-				evaluate();
+				
+				if (!emojiHist.atLeastFive()){
+					history.setOpaque(false);
+					history.revalidate();
+					history.repaint();
+					
+					restart = new JButton();
+					restart.setIcon(new ImageIcon(getClass().getClassLoader().
+						getResource("\\images\\guiGraphics\\restart.png")));
+					restart.setBorder(null);
+					restart.setContentAreaFilled(false);
+				
+					restartListener restListener = new restartListener();
+					restart.addActionListener(restListener);
+					cenPanel.remove(done);
+					cenPanel.add(restart);
+					delete.setEnabled(false);
+					
+					cenPanel.revalidate();
+					cenPanel.repaint();
+					
+					evaluate();
+				}
+				else{
+					history.setOpaque(true);
+					history.setBackground(new Color(230, 130, 130));
+					history.revalidate();
+					history.repaint();
+				}
 		}
 	}
 
@@ -259,19 +327,9 @@ public class tarotApp {
 		
 		// TODO
 		int meanSenti = 30;
-		ArrayList<Double> values = new ArrayList<Double>();
-		values.add(new Double(10));
-		values.add(new Double(20));
-		values.add(new Double(30));
-		values.add(new Double(15));
-		values.add(new Double(15));
-		
-		
-//		evalPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-//		JPanel temp01 = new JPanel();
-//		JPanel temp02 = new JPanel();
-		
-		evalPanel = new JPanel(new BorderLayout());
+			
+		evalPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+
 		
 		// Define slider
 		JSlider slider = new JSlider(JSlider.HORIZONTAL, -100, 100, meanSenti);
@@ -286,7 +344,7 @@ public class tarotApp {
 		
 		// Define pie chart	
 	    org.knowm.xchart.PieChart chart = new PieChartBuilder().
-	    		width(200).height(200).title(getClass().getSimpleName()).
+	    		width(500).height(300).title(getClass().getSimpleName()).
 	    		build();
 	    
 	    // Customize Chart
@@ -294,34 +352,31 @@ public class tarotApp {
 	    chart.getStyler().setSeriesColors(sliceColors);
 	 
 	    // Series
+	    // TODO
+//	    for (int i = 0; i < emojiHist.attributes.length(); i++) {
+//	    	int value = emojiHist.attributes[i];
+//	    	String seriesName = emojiHist.attributeNames[i];
+//			chart.addSeries(seriesName, value);
+//		}
 	    chart.addSeries("Faces", 24);
 	    chart.addSeries("Signs", 21);
 	    chart.addSeries("Objects", 39);
 	    chart.addSeries("Nature", 17);
 	    chart.addSeries("Love", 20);
 	    chart.addSeries("Food", 20);
-	    
-	    
-	    @SuppressWarnings({ "unchecked", "rawtypes" })
-		JPanel chartPanel = new XChartPanel(chart);
-		evalPanel.add(chartPanel,BorderLayout.CENTER);
 
-		
-//		evalPanel.setResizeWeight(0.7);
-//		evalPanel.setEnabled(false);
-//		evalPanel.setDividerSize(0);
-//		
-//		temp01.add(slider);
-//		temp02.add(pieChart);
-//		temp02.setPreferredSize(new Dimension(200, 200));
-//		evalPanel.add(temp01);
-//		evalPanel.add(temp02);
-//
-		evalPanel.setBorder(new EmptyBorder(0, 50, 20, 50));
-		evalPanel.setBackground(Color.BLUE);
+		evalPanel.setResizeWeight(0.7);
+		evalPanel.setEnabled(true);
+		evalPanel.setDividerSize(0);
+		evalPanel.add(slider);
+		evalPanel.add(new XChartPanel(chart));
+		evalPanel.setBorder(new EmptyBorder(0, 30, 20, 30));
+
 
 		mainFrame.remove(botPanel);
+		mainFrame.remove(emoPanel);
 		mainFrame.revalidate();
+		//mainFrame.repaint();
 		mainFrame.getContentPane().add(evalPanel, BorderLayout.PAGE_END);		
 		mainFrame.revalidate();
 		mainFrame.repaint();
