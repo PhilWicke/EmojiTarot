@@ -30,8 +30,15 @@ public class MySliderUI extends BasicSliderUI {
         Rectangle t = trackRect;
         Point2D start = new Point2D.Float(t.x, t.y);
         Point2D end = new Point2D.Float(t.width, t.height);
-        Color[] colors = {Color.magenta, Color.blue, Color.cyan,
-            Color.green, Color.yellow, Color.red};
+        //Color[] colors = {Color.magenta, Color.blue, Color.cyan,
+        //    Color.green, Color.yellow, Color.red};
+        Color[] colors = {	new Color(255, 0, 0),
+        		new Color(204, 51, 0), 
+        		new Color(153, 102, 0),
+        		new Color(102, 153, 0),
+        		new Color(51, 204, 0), 
+        		new Color(0, 255, 0),};
+        
         p = new LinearGradientPaint(start, end, fracs, colors);
         g2d.setPaint(p);
         g2d.fillRect(t.x, t.y, t.width, t.height);

@@ -27,7 +27,10 @@ import javax.swing.JSlider;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EmptyBorder;
+import javax.swing.plaf.metal.MetalLookAndFeel;
+import javax.swing.plaf.metal.OceanTheme;
 
 
 
@@ -248,7 +251,7 @@ public class tarotApp {
 		int meanSenti = 30;
 		
 		evalPanel = new JPanel(new BorderLayout());
-		JSlider slider = new JSlider(JSlider.VERTICAL, -100, 100, meanSenti);
+		JSlider slider = new JSlider(JSlider.HORIZONTAL, -100, 100, meanSenti);
 
 		slider.setEnabled(false);
 		slider.setMinorTickSpacing(5);
@@ -257,13 +260,10 @@ public class tarotApp {
 		slider.setPaintTrack(true);
 		slider.setPaintLabels(true);
 		slider.setToolTipText("Emoji Sentiment Score: "+meanSenti);
-		
-		MySliderUI gradientUI = new MySliderUI(slider);
-		float[] gradient = {0.0f, 0.2f, 0.4f, 0.6f, 0.8f, 1.0f};
-		gradientUI.setColorRange(gradient);
 		slider.setUI(new MySliderUI(slider));
 		
-		evalPanel.add(slider, BorderLayout.WEST);
+		
+		evalPanel.add(slider, BorderLayout.CENTER);
 		
 		
 		mainFrame.remove(botPanel);
