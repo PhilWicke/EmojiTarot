@@ -16,6 +16,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -24,6 +26,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
+import javax.swing.JSplitPane;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -31,6 +34,13 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EmptyBorder;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 import javax.swing.plaf.metal.OceanTheme;
+
+import org.knowm.xchart.PieChartBuilder;
+import org.knowm.xchart.XChartPanel;
+import org.knowm.xchart.XYChart;
+import org.knowm.xchart.XYChartBuilder;
+import org.knowm.xchart.XYSeries.XYSeriesRenderStyle;
+import org.knowm.xchart.style.Styler.LegendPosition;
 
 
 
@@ -249,10 +259,22 @@ public class tarotApp {
 		
 		// TODO
 		int meanSenti = 30;
+		ArrayList<Double> values = new ArrayList<Double>();
+		values.add(new Double(10));
+		values.add(new Double(20));
+		values.add(new Double(30));
+		values.add(new Double(15));
+		values.add(new Double(15));
+		
+		
+//		evalPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+//		JPanel temp01 = new JPanel();
+//		JPanel temp02 = new JPanel();
 		
 		evalPanel = new JPanel(new BorderLayout());
+		
+		// Define slider
 		JSlider slider = new JSlider(JSlider.HORIZONTAL, -100, 100, meanSenti);
-
 		slider.setEnabled(false);
 		slider.setMinorTickSpacing(5);
 		slider.setMajorTickSpacing(10);
@@ -262,13 +284,45 @@ public class tarotApp {
 		slider.setToolTipText("Emoji Sentiment Score: "+meanSenti);
 		slider.setUI(new MySliderUI(slider));
 		
+		// Define pie chart	
+	    org.knowm.xchart.PieChart chart = new PieChartBuilder().
+	    		width(200).height(200).title(getClass().getSimpleName()).
+	    		build();
+	    
+	    // Customize Chart
+	    Color[] sliceColors = new Color[] {Color.gray, Color.green, Color.blue, Color.pink, Color.yellow, Color.red};
+	    chart.getStyler().setSeriesColors(sliceColors);
+	 
+	    // Series
+	    chart.addSeries("Faces", 24);
+	    chart.addSeries("Signs", 21);
+	    chart.addSeries("Objects", 39);
+	    chart.addSeries("Nature", 17);
+	    chart.addSeries("Love", 20);
+	    chart.addSeries("Food", 20);
+	    
+	    
+	    @SuppressWarnings({ "unchecked", "rawtypes" })
+		JPanel chartPanel = new XChartPanel(chart);
+		evalPanel.add(chartPanel,BorderLayout.CENTER);
+
 		
-		evalPanel.add(slider, BorderLayout.CENTER);
-		
-		
+//		evalPanel.setResizeWeight(0.7);
+//		evalPanel.setEnabled(false);
+//		evalPanel.setDividerSize(0);
+//		
+//		temp01.add(slider);
+//		temp02.add(pieChart);
+//		temp02.setPreferredSize(new Dimension(200, 200));
+//		evalPanel.add(temp01);
+//		evalPanel.add(temp02);
+//
+		evalPanel.setBorder(new EmptyBorder(0, 50, 20, 50));
+		evalPanel.setBackground(Color.BLUE);
+
 		mainFrame.remove(botPanel);
 		mainFrame.revalidate();
-		mainFrame.getContentPane().add(evalPanel, BorderLayout.PAGE_END);
+		mainFrame.getContentPane().add(evalPanel, BorderLayout.PAGE_END);		
 		mainFrame.revalidate();
 		mainFrame.repaint();
 		
