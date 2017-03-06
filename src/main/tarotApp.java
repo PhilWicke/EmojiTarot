@@ -19,6 +19,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.Hashtable;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -327,24 +329,41 @@ public class tarotApp {
 		
 		// TODO
 		int meanSenti = 30;
-			
-		evalPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-
 		
-		// Define slider
-		JSlider slider = new JSlider(JSlider.HORIZONTAL, -100, 100, meanSenti);
-		slider.setEnabled(false);
-		slider.setMinorTickSpacing(5);
-		slider.setMajorTickSpacing(10);
-		slider.setPaintTicks(true);
-		slider.setPaintTrack(true);
-		slider.setPaintLabels(true);
-		slider.setToolTipText("Emoji Sentiment Score: "+meanSenti);
-		slider.setUI(new MySliderUI(slider));
+		String analysisDesc = 
+		"<html><body>Your sentiment score has been evaluted using the"
+		+ " Emoji Sentiment Ranking <br>(Kralj Novak P, Smailović J, Sluban B,"
+		+ " Mozetič I (2015) Sentiment of Emojis. <br>PLoS ONE 10(12): e0144296."
+		+ " doi:10.1371/journal.pone.0144296). This rank-<br>ing has been "
+		+ " evaluated analyzing 1.6 million tweets in 13 European lan-<br>guages"
+		+ " by the sentiment polarity (negative, neutral, positive). You"
+		+ " have a score<br> of "+meanSenti+" in the range between -100"
+		+ " (strongly negative) and +100 (strongly positive). <br><br>"
+		+ " On the right side you see your distribution of Emoji. It "
+		+ " shows the categories you<br> mostly use based on your given "
+		+ " history of Emoji.</body></html>";
+
+		evalPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+		
+		// Define slider area
+		JSplitPane sliderPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+		sliderPanel.setDividerSize(0);
+		JLabel sliderHeader = new JLabel("Your Emoji Sentiment Score: "+meanSenti,SwingConstants.CENTER);
+		sliderHeader.setFont(new Font("SansSerif", Font.BOLD, 20));
+		sliderHeader.setBorder(new EmptyBorder(0, 0, 20, 0));
+		sliderPanel.add(sliderHeader);
+		
+		// define chart area
+		JSplitPane chartPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+		chartPanel.setDividerSize(0);
+		JLabel chartDesc = new JLabel(analysisDesc);
+		chartDesc.setFont(new Font("SansSerif", Font.PLAIN, 15));
+		chartDesc.setBorder(new EmptyBorder(0,20,0,20));
+		chartPanel.add(chartDesc);
 		
 		// Define pie chart	
 	    org.knowm.xchart.PieChart chart = new PieChartBuilder().
-	    		width(500).height(300).title(getClass().getSimpleName()).
+	    		width(100).height(300).title("Your Emoji Distribution").
 	    		build();
 	    
 	    // Customize Chart
@@ -364,12 +383,18 @@ public class tarotApp {
 	    chart.addSeries("Nature", 17);
 	    chart.addSeries("Love", 20);
 	    chart.addSeries("Food", 20);
+		
+		// Define slider
+		JSlider slider = createSlider(meanSenti);
 
 		evalPanel.setResizeWeight(0.7);
 		evalPanel.setEnabled(true);
 		evalPanel.setDividerSize(0);
-		evalPanel.add(slider);
-		evalPanel.add(new XChartPanel(chart));
+		
+		sliderPanel.add(slider);
+		chartPanel.add(new XChartPanel(chart));
+		evalPanel.add(sliderPanel);
+		evalPanel.add(chartPanel);
 		evalPanel.setBorder(new EmptyBorder(0, 30, 20, 30));
 
 
@@ -382,6 +407,65 @@ public class tarotApp {
 		mainFrame.repaint();
 		
 		
+	}
+
+	private JSlider createSlider(int meanSenti) {
+		JSlider slider = new JSlider(JSlider.HORIZONTAL, -100, 100, meanSenti);
+		slider.setEnabled(false);
+		slider.setMinorTickSpacing(5);
+		slider.setMajorTickSpacing(10);
+		slider.setPaintTicks(true);
+		slider.setPaintTrack(true);
+		slider.setPaintLabels(true);
+		slider.setToolTipText("Emoji Sentiment Score: "+meanSenti);
+		slider.setUI(new MySliderUI(slider));
+		
+		 //Create the label table.
+		        Hashtable<Integer, JLabel> labelTable = 
+            new Hashtable<Integer, JLabel>();
+        Hashtable<Integer, ImageIcon> iconTable = 
+                new Hashtable<Integer, ImageIcon>();
+        
+        // set marker point
+        ImageIcon veryNegIcon = new ImageIcon(getClass().getClassLoader().
+         		 getResource("\\images\\guiGraphics\\veryNeg.png"));
+        iconTable.put(-100, veryNegIcon);
+        labelTable.put(-100,new JLabel(veryNegIcon));
+        
+        // set marker point
+        ImageIcon slightNegIcon = new ImageIcon(getClass().getClassLoader().
+        		 getResource("\\images\\guiGraphics\\slightlyNeg.png"));
+        iconTable.put(-50, slightNegIcon);
+        labelTable.put(-50,new JLabel(slightNegIcon));
+        
+        // set marker point
+        ImageIcon neutralIcon = new ImageIcon(getClass().getClassLoader().
+       		 getResource("\\images\\guiGraphics\\neutral.png"));
+        iconTable.put(0, neutralIcon);
+        labelTable.put(0,new JLabel(neutralIcon));
+       
+        // set marker point
+        ImageIcon slightPosIcon = new ImageIcon(getClass().getClassLoader().
+      		 getResource("\\images\\guiGraphics\\slightlyPos.png"));
+        iconTable.put(50, slightPosIcon);
+        labelTable.put(50,new JLabel(slightPosIcon));
+      
+        // set marker point
+        ImageIcon veryPosIcon = new ImageIcon(getClass().getClassLoader().
+     		 getResource("\\images\\guiGraphics\\veryPos.png"));
+        iconTable.put(100, veryPosIcon);
+        labelTable.put(100,new JLabel(veryPosIcon));
+        
+        // set all disabled icons
+	    Enumeration<Integer> enumKey = labelTable.keys();
+	    while(enumKey.hasMoreElements()) {
+	    	int key = enumKey.nextElement();
+	    	JLabel currLabel = labelTable.get(key);
+	    	currLabel.setDisabledIcon(iconTable.get(key));
+	    }
+           
+        slider.setLabelTable(labelTable);
+		return slider;
 	}
 
 	private JPanel createEvalPanel(JPanel evalPanel) {
