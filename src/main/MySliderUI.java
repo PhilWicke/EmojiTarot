@@ -1,7 +1,6 @@
 package main;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.LinearGradientPaint;
@@ -10,10 +9,7 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.Point2D;
 
-import javax.swing.ImageIcon;
 import javax.swing.JSlider;
-import javax.swing.UIDefaults;
-import javax.swing.UIManager;
 import javax.swing.plaf.basic.BasicSliderUI;
 
 public class MySliderUI extends BasicSliderUI {
@@ -37,40 +33,27 @@ public class MySliderUI extends BasicSliderUI {
         Point2D end = new Point2D.Float(t.width, t.height);
         //Color[] colors = {Color.magenta, Color.blue, Color.cyan,
         //    Color.green, Color.yellow, Color.red};
+        
         Color[] colors = {	new Color(255, 0, 0),
         		new Color(204, 51, 0), 
         		new Color(153, 102, 0),
         		new Color(102, 153, 0),
         		new Color(51, 204, 0), 
         		new Color(0, 255, 0),};
+//        Color[] colors = {	new Color(178, 34, 34),
+//        		new Color(154, 63, 50), 
+//        		new Color(130, 92, 66),
+//        		new Color(107, 121, 81),
+//        		new Color(83, 150, 97), 
+//        		new Color(60, 179, 113)};
         
         p = new LinearGradientPaint(start, end, fracs, colors);
         g2d.setPaint(p);
         g2d.fillRect(t.x, t.y, t.width, t.height);
     }
-	
-	
-	
-	//
-	private int thumbHeight = 22;
-    private int thumbWidth = 22;
-
-    
-    @Override
-    protected Dimension getThumbSize() {
-        return new Dimension(thumbHeight, thumbWidth);
-    }
-
-
-
 
     @Override
     public void paintThumb(Graphics g) {
-    	
-//	    // set finger pointer
-//	    ImageIcon icon = new ImageIcon(getClass().getClassLoader().
-//	     		 getResource("\\images\\guiGraphics\\finger.png"));
-
     	
         Graphics2D g2d = (Graphics2D) g;
         g2d.setRenderingHint(
@@ -78,11 +61,21 @@ public class MySliderUI extends BasicSliderUI {
             RenderingHints.VALUE_ANTIALIAS_ON);
         Rectangle t = thumbRect;
         
-        g2d.setColor(Color.black);
+        int[] x = new int[3];
+        int[] y = new int[3];
+        int n = 3; // count of points
         int tw2 = t.width / 2;
-        g2d.drawLine(t.x, t.y, t.x + t.width - 1, t.y);
-        g2d.drawLine(t.x, t.y, t.x + tw2, t.y + t.height);
-        g2d.drawLine(t.x + t.width - 1, t.y, t.x + tw2, t.y + t.height);
+        
+        x[0] = t.x;
+        y[0] = t.y-t.height*2;
+        x[1] = t.x+tw2;
+        y[1] = t.height+t.height*2-12;
+        x[2] = t.x+t.width-1;
+        y[2] = t.y-t.height*2;
+        Polygon fThumb = new Polygon(x,y,n);
+        g2d.setPaint(Color.blue);
+        g2d.fill(fThumb);
+        
     }
 
 }

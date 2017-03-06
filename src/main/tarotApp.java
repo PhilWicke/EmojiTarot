@@ -353,7 +353,6 @@ public class tarotApp {
 		sliderPanel.setDividerSize(0);
 		JLabel sliderHeader = new JLabel("Your Emoji Sentiment Score: "+meanSenti,SwingConstants.CENTER);
 		sliderHeader.setFont(new Font("SansSerif", Font.BOLD, 20));
-		sliderHeader.setBorder(new EmptyBorder(0, 0, 20, 0));
 		sliderPanel.add(sliderHeader);
 		
 		// define chart area
@@ -370,7 +369,13 @@ public class tarotApp {
 	    		build();
 	    
 	    // Customize Chart
-	    Color[] sliceColors = new Color[] {Color.gray, Color.green, Color.blue, Color.pink, Color.yellow, Color.red};
+	    Color[] sliceColors = new Color[] {
+	    		new Color(210,180,140),	// ceramic
+	    		new Color(60,179,113), // green
+	    		new Color(178,34,34), // red
+	    		new Color(147,112,219), // violett
+	    		new Color(238,221,130),  // yellow
+	    		new Color(100,149,237)}; // blue
 	    chart.getStyler().setSeriesColors(sliceColors);
 	 
 	    // Series
@@ -467,7 +472,7 @@ public class tarotApp {
 	    	currLabel.setDisabledIcon(iconTable.get(key));
 	    }
 	    
-  
+		slider.setBorder(new EmptyBorder(30, 0, 0, 0));
         slider.setLabelTable(labelTable);
 		return slider;
 	}
