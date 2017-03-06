@@ -1,14 +1,19 @@
 package main;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.LinearGradientPaint;
+import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.Point2D;
 
+import javax.swing.ImageIcon;
 import javax.swing.JSlider;
+import javax.swing.UIDefaults;
+import javax.swing.UIManager;
 import javax.swing.plaf.basic.BasicSliderUI;
 
 public class MySliderUI extends BasicSliderUI {
@@ -43,14 +48,36 @@ public class MySliderUI extends BasicSliderUI {
         g2d.setPaint(p);
         g2d.fillRect(t.x, t.y, t.width, t.height);
     }
+	
+	
+	
+	//
+	private int thumbHeight = 22;
+    private int thumbWidth = 22;
+
+    
+    @Override
+    protected Dimension getThumbSize() {
+        return new Dimension(thumbHeight, thumbWidth);
+    }
+
+
+
 
     @Override
     public void paintThumb(Graphics g) {
+    	
+//	    // set finger pointer
+//	    ImageIcon icon = new ImageIcon(getClass().getClassLoader().
+//	     		 getResource("\\images\\guiGraphics\\finger.png"));
+
+    	
         Graphics2D g2d = (Graphics2D) g;
         g2d.setRenderingHint(
             RenderingHints.KEY_ANTIALIASING,
             RenderingHints.VALUE_ANTIALIAS_ON);
         Rectangle t = thumbRect;
+        
         g2d.setColor(Color.black);
         int tw2 = t.width / 2;
         g2d.drawLine(t.x, t.y, t.x + t.width - 1, t.y);

@@ -5,20 +5,15 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Image;
-import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.InputMethodEvent;
-import java.awt.event.InputMethodListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
@@ -32,20 +27,10 @@ import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JSplitPane;
 import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
-import javax.swing.plaf.metal.MetalLookAndFeel;
-import javax.swing.plaf.metal.OceanTheme;
 
 import org.knowm.xchart.PieChartBuilder;
 import org.knowm.xchart.XChartPanel;
-import org.knowm.xchart.XYChart;
-import org.knowm.xchart.XYChartBuilder;
-import org.knowm.xchart.XYSeries.XYSeriesRenderStyle;
-import org.knowm.xchart.style.Styler.LegendPosition;
 
 
 
@@ -73,7 +58,6 @@ public class tarotApp {
 	private String emojiPath;
 	private int numCateg 	 = 4;
 	private String currentCat;
-	private String lastCat;
 	
 	// Define mainFrame 
 	private JFrame mainFrame;
@@ -242,11 +226,20 @@ public class tarotApp {
 			
 			mainFrame.getContentPane().remove(evalPanel);
 			botPanel = new JPanel(new BorderLayout());
-			//TODO
+
 			mainFrame.getContentPane().add(botPanel, BorderLayout.PAGE_END);
 			botPanel = createBotPanel(botPanel);
 			cenPanel.revalidate();
 			cenPanel.repaint();
+			
+			// reset top panel
+			String startMsg = "<html><span style='font-size:18px'>Welcome to the Emoji handreading. Show me your Emoji and I tell you who you are. First, you take your smartphone and open you preferred messenging app. Now go to your history of Emoji and enter them into this program. Click through the categories to find at least 5 of your most used Emoji. If you are done, press <b>DONE</b> and wait for the magic to happen.</span></html>";
+			topPanel.removeAll();
+			topPanel = createTopPanel(topPanel, startMsg);
+			
+			topPanel.revalidate();
+			topPanel.repaint();
+			
 		}
 	}
 	
@@ -282,10 +275,18 @@ public class tarotApp {
 					restart.addActionListener(restListener);
 					cenPanel.remove(done);
 					cenPanel.add(restart);
+					cenPanel.setBorder(new EmptyBorder(10,30,10,10));
 					delete.setEnabled(false);
-					
+
 					cenPanel.revalidate();
 					cenPanel.repaint();
+					
+					String endMsg = "<html><span style='font-size:18px'>Thank you for showing me your Emoji history. Below you find the analysis of what they reveal to me about you.</span></html>";
+					topPanel.removeAll();
+					topPanel = createTopPanel(topPanel, endMsg);
+					
+					topPanel.revalidate();
+					topPanel.repaint();
 					
 					evaluate();
 				}
@@ -315,7 +316,8 @@ public class tarotApp {
 		mainFrame.getContentPane().add(botPanel, BorderLayout.PAGE_END);
 				
 		System.out.println("Creating top panel...");
-		topPanel = createTopPanel(topPanel);
+		String startMsg = "<html><span style='font-size:18px'>Welcome to the Emoji handreading. Show me your Emoji and I tell you who you are. First, you take your smartphone and open you preferred messenging app. Now go to your history of Emoji and enter them into this program. Click through the categories to find at least 5 of your most used Emoji. If you are done, press <b>DONE</b> and wait for the magic to happen.</span></html>";
+		topPanel = createTopPanel(topPanel, startMsg);
 		System.out.println("Creating central panel...");
 		cenPanel = createCenPanel(cenPanel);
 		System.out.println("Creating bottom panel...");
@@ -325,6 +327,7 @@ public class tarotApp {
 		mainFrame.setVisible(true);		
 	}
 	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void evaluate() {
 		
 		// TODO
@@ -463,15 +466,10 @@ public class tarotApp {
 	    	JLabel currLabel = labelTable.get(key);
 	    	currLabel.setDisabledIcon(iconTable.get(key));
 	    }
-           
+	    
+  
         slider.setLabelTable(labelTable);
 		return slider;
-	}
-
-	private JPanel createEvalPanel(JPanel evalPanel) {
-		JSlider slider = new JSlider(JSlider.VERTICAL, -100, 100, 15);
-		evalPanel.add(slider);
-		return null;
 	}
 
 	private JPanel createBotPanel(JPanel panel) {
@@ -530,8 +528,7 @@ private JPanel createCenPanel(JPanel panel) {
 		return panel;
 	}
 
-private JPanel createTopPanel(JPanel panel) {
-		String descr = "<html><span style='font-size:18px'>Welcome to the Emoji handreading. Show me your Emoji and I tell you who you are. First, you take your smartphone and open you preferred messenging app. Now go to your history of Emoji and enter them into this program. Click through the categories to find at least 5 of your most used Emoji. If you are done, press <b>DONE</b> and wait for the magic to happen.</span></html>";
+private JPanel createTopPanel(JPanel panel, String descr) {
 
 		header      = new JLabel("Emoji - Palmistry", SwingConstants.CENTER);
 		descrip 	= new JLabel(descr);
