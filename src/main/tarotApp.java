@@ -233,7 +233,7 @@ public class tarotApp {
 			cenPanel.repaint();
 			
 			// reset top panel
-			String startMsg = "<html><span style='font-size:18px'>Welcome to the Emoji handreading. Show me your Emoji and I tell you who you are. First, you take your smartphone and open you preferred messenging app. Now go to your history of Emoji and enter them into this program. Click through the categories to find at least 5 of your most used Emoji. If you are done, press <b>DONE</b> and wait for the magic to happen.</span></html>";
+			String startMsg = "<html><span style='font-size:18px'>Welcome to the Emoji handreading. Show me your Emoji and I tell you who you are. First, you take your smartphone and open you preferred messenging app. Now go to your history of Emoji and enter them into this program. Click through the categories to find at least 5 of your most used Emoji. If you are done, press <b>OK</b> and wait for the magic to happen.</span></html>";
 			topPanel.removeAll();
 			topPanel = createTopPanel(topPanel, startMsg);
 			
@@ -316,7 +316,7 @@ public class tarotApp {
 		mainFrame.getContentPane().add(botPanel, BorderLayout.PAGE_END);
 				
 		System.out.println("Creating top panel...");
-		String startMsg = "<html><span style='font-size:18px'>Welcome to the Emoji handreading. Show me your Emoji and I tell you who you are. First, you take your smartphone and open you preferred messenging app. Now go to your history of Emoji and enter them into this program. Click through the categories to find at least 5 of your most used Emoji. If you are done, press <b>DONE</b> and wait for the magic to happen.</span></html>";
+		String startMsg = "<html><span style='font-size:18px'>Welcome to the Emoji handreading. Show me your Emoji and I tell you who you are. First, you take your smartphone and open you preferred messenging app. Now go to your history of Emoji and enter them into this program. Click through the categories to find at least 5 of your most used Emoji. If you are done, press <b>OK</b> and wait for the magic to happen.</span></html>";
 		topPanel = createTopPanel(topPanel, startMsg);
 		System.out.println("Creating central panel...");
 		cenPanel = createCenPanel(cenPanel);
@@ -330,8 +330,7 @@ public class tarotApp {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void evaluate() {
 		
-		// TODO
-		int meanSenti = 30;
+		int meanSenti = emojiHist.getMeanSenti();
 		
 		String analysisDesc = 
 		"<html><body>Your sentiment score has been evaluted using the"
@@ -379,18 +378,21 @@ public class tarotApp {
 	    chart.getStyler().setSeriesColors(sliceColors);
 	 
 	    // Series
-	    // TODO
-//	    for (int i = 0; i < emojiHist.attributes.length(); i++) {
-//	    	int value = emojiHist.attributes[i];
-//	    	String seriesName = emojiHist.attributeNames[i];
-//			chart.addSeries(seriesName, value);
-//		}
-	    chart.addSeries("Faces", 24);
-	    chart.addSeries("Signs", 21);
-	    chart.addSeries("Objects", 39);
-	    chart.addSeries("Nature", 17);
-	    chart.addSeries("Love", 20);
-	    chart.addSeries("Food", 20);
+	    int[] attributes = emojiHist.getAttributes();
+	    for (int i = 0; i < 6; i++) {
+	    	
+	    	int value = attributes[i];
+	    	String seriesName = emojiHist.attributeNames[i];
+			chart.addSeries(seriesName, value);
+			System.out.println(value);
+		}
+//	    chart.addSeries("Faces", 24);
+//	    chart.addSeries("Signs", 21);
+//	    chart.addSeries("Objects", 39);
+//	    chart.addSeries("Nature", 17);
+//	    chart.addSeries("Food", 20);
+//	    chart.addSeries("Love", 20);
+
 		
 		// Define slider
 		JSlider slider = createSlider(meanSenti);
@@ -575,7 +577,7 @@ private void initHistory(JPanel history) {
 private void addToHistory(String unicode) {
 	boolean hasSentiCode = false;
 	for (int i = 0; i < sentiCodes.length; i++) {
-		//System.out.println("Comparing: "+unicode+" and "+sentiCodes[i]);
+		
 		if(unicode.equals(sentiCodes[i])){
 			Emoji emoji = new Emoji(unicode,currentCat,sentiScores[i]);
 			emojiHist.removeAllPlaceholder();
