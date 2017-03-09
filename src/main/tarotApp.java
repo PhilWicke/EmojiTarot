@@ -333,17 +333,30 @@ public class tarotApp {
 		int meanSenti = emojiHist.getMeanSenti();
 		
 		String analysisDesc = 
-		"<html><body>Your sentiment score has been evaluted using the"
-		+ " Emoji Sentiment Ranking <br>(Kralj Novak P, Smailović J, Sluban B,"
-		+ " Mozetič I (2015) Sentiment of Emojis. <br>PLoS ONE 10(12): e0144296."
-		+ " doi:10.1371/journal.pone.0144296). This rank-<br>ing has been "
-		+ " evaluated analyzing 1.6 million tweets in 13 European lan-<br>guages"
+		"<html><head><style>div(text-align:justify;)</style></head><body><div>Your sentiment score has been evaluted using the"
+		+ " Emoji Sentiment Ranking (Kralj Novak P, Smailović J, Sluban B,"
+		+ " Mozetič I (2015) Sentiment of Emojis. PLoS ONE 10(12): e0144296."
+		+ " doi:10.1371/journal.pone.0144296). This ranking has been "
+		+ " evaluated analyzing 1.6 million tweets in 13 European languages"
 		+ " by the sentiment polarity (negative, neutral, positive). You"
-		+ " have a score<br> of "+meanSenti+" in the range between -100"
-		+ " (strongly negative) and +100 (strongly positive). <br><br>"
+		+ " have a score of "+meanSenti+" in the range between -100"
+		+ " (strongly negative) and +100 (strongly positive). <br>"
 		+ " On the right side you see your distribution of Emoji. It "
-		+ " shows the categories you<br> mostly use based on your given "
-		+ " history of Emoji.</body></html>";
+		+ " shows the categories you mostly use based on your given "
+		+ " history of Emoji.</div></body></html>";
+		
+//		String analysisDesc = 
+//		"<html><body><div>Your sentiment score has been evaluted using the"
+//		+ " Emoji Sentiment Ranking <br>(Kralj Novak P, Smailović J, Sluban B,"
+//		+ " Mozetič I (2015) Sentiment of Emojis. <br>PLoS ONE 10(12): e0144296."
+//		+ " doi:10.1371/journal.pone.0144296). This rank-<br>ing has been "
+//		+ " evaluated analyzing 1.6 million tweets in 13 European lan-<br>guages"
+//		+ " by the sentiment polarity (negative, neutral, positive). You"
+//		+ " have a score<br> of "+meanSenti+" in the range between -100"
+//		+ " (strongly negative) and +100 (strongly positive). <br><br>"
+//		+ " On the right side you see your distribution of Emoji. It "
+//		+ " shows the categories you<br> mostly use based on your given "
+//		+ " history of Emoji.</div></body></html>";
 
 		evalPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 		
@@ -358,6 +371,7 @@ public class tarotApp {
 		JSplitPane chartPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 		chartPanel.setDividerSize(0);
 		JLabel chartDesc = new JLabel(analysisDesc);
+		chartPanel.setResizeWeight(0.4);
 		chartDesc.setFont(new Font("SansSerif", Font.PLAIN, 15));
 		chartDesc.setBorder(new EmptyBorder(0,20,0,20));
 		chartPanel.add(chartDesc);
